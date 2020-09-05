@@ -8,9 +8,6 @@ namespace LED_Block_Cipher
 {
     class Number
     {
-        //enum hexNumber { _0, _1, _2 , _3 ,_4, _5, _6, _7, _8, _9, A, B, C, D, E, F };
-
-        //hexNumber number;
 
         int number;
 
@@ -91,9 +88,63 @@ namespace LED_Block_Cipher
         }
     }
 
+
+    class Column
+    {
+        Number[,] col = new Number[4, 1];
+
+
+        public Column()
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                this.column[i, 0] = new Number(0);
+            }
+        }
+
+
+        public Column(int c0 , int c1 , int c2 , int c3)
+        {
+            this.column[0, 0] = new Number(c0);
+            this.column[1, 0] = new Number(c1);
+            this.column[2, 0] = new Number(c2);
+            this.column[3, 0] = new Number(c3);
+        }
+
+
+        public Column(int[] elements)
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                this.column[i, 0] = new Number(elements[i]);
+            }
+        }
+
+        public static void showColumn(Column col)
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                Console.WriteLine(col.column[i, 0].Num);
+            }
+        }
+
+        internal Number[,] column
+        {
+            get
+            {
+                return col;
+            }
+
+            set
+            {
+                col = value;
+            }
+        }
+    }
+
     class Block
     {
-        Number[,] blck = new Number[4,4];
+        Number[,] blck = new Number[4, 4];
 
         public Block()
         {
@@ -103,6 +154,18 @@ namespace LED_Block_Cipher
                 {
                     this.blck[i, j] = new Number(0);
                 }
+            }
+        }
+
+        public Block(Column c0 , Column c1 , Column c2 , Column c3)
+        {
+
+            for (int i = 0; i < 4; i++)
+            {
+                this.blck[i, 0] = new Number(c0.column[i, 0].Num);
+                this.blck[i, 1] = new Number(c1.column[i, 0].Num);
+                this.blck[i, 2] = new Number(c2.column[i, 0].Num);
+                this.blck[i, 3] = new Number(c3.column[i, 0].Num);
             }
         }
 
@@ -172,6 +235,30 @@ namespace LED_Block_Cipher
                 }
             }
             return blc3;
+        }
+
+
+        public static Column operator *(Block blc, Column col)
+        {
+            int m = 4;
+            int n = 4;
+            int q = 1;
+            //Number[,] blc3 = new Number[4, 1];
+            Column res = new Column();
+            for (int i = 0; i < m; i++)
+            {
+                for (int j = 0; j < q; j++)
+                {
+                    Number result = new Number();
+                    for (int k = 0; k < n; k++)
+                    {
+                        result = result + (blc.block[i, k] * col.column[k, j]); // Number multiple
+                    }
+                    res.column[i, j] = new Number(result.Num);
+                }
+            }
+
+            return res;
         }
 
 
@@ -407,6 +494,28 @@ namespace LED_Block_Cipher
         }
 
 
+        public static void insertColumnInBlock(Block blc , Column clm , int ColumnNumber)
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                blc.block[i, ColumnNumber].Num = clm.column[i , 0].Num;
+            }
+        }
+
+
+        public static Column insertBlockInColumn(Block blc, int ColumnNumber)
+        {
+            Column result = new Column();
+
+            for (int i = 0; i < 4; i++)
+            {
+                result.column[i, 0].Num = blc.block[i, ColumnNumber].Num;
+            }
+
+            return result;
+        }
+
+
         internal Number[,] block
         {
             get
@@ -455,6 +564,7 @@ namespace LED_Block_Cipher
                 }
                 Console.Write("\n");
             }
+            Console.WriteLine();
         }
     }
 
@@ -462,8 +572,33 @@ namespace LED_Block_Cipher
     {
 
         Block plainText;
+        Block cipherText;
         Block key;
 
+        static int[,] mdsMatrix =
+                {
+                    { 4, 1, 2, 2 },
+                    { 8, 6, 5, 6 },
+                    { 11, 14, 10, 9 },
+                    { 2, 2, 15, 11 }
+                };
+        static Block MDS = new Block(mdsMatrix);
+
+        static int[,] imdsMatrix =
+                {
+                    { 12, 12, 13, 4 },
+                    { 3, 8, 4, 5 },
+                    { 7, 6, 2, 14 },
+                    { 13, 9, 9, 13 }
+                };
+        static Block IMDS = new Block(imdsMatrix);
+
+        static int[] SBox =  { 12, 5, 6, 11, 9, 0, 10, 13, 3, 14, 15, 8, 4, 7, 1, 2 };
+        static int[] iSBox = { 5, 14, 15, 8, 12, 1, 2, 13, 11, 4, 6, 3, 0, 7, 9, 10 };
+
+
+        static bool leftShift = false;
+        static bool inverseLeftShift = true;
 
 
         public LED()
@@ -489,15 +624,15 @@ namespace LED_Block_Cipher
             Block.showBlock(key);
             /////////////////////////////////////////////////
 
-            Block cipherText = blockCopy(plainText);
+            Block cipher_text = blockCopy(plainText);
 
             // Pre_Whitening :
-            cipherText = addRoundKey(cipherText , key);
+            cipher_text = addRoundKey(cipher_text, key);
 
-            // Show AddRoundKey level - Round : 0
+            // Show AddRoundKey level - Round : 1
             Console.WriteLine("------------------------------------");
-            Console.WriteLine("\tAddRoundKey Level - Round : " + 0);
-            Block.showBlock(cipherText);
+            Console.WriteLine("\tAddRoundKey Level - Round : " + 1);
+            Block.showBlock(cipher_text);
             /////////////////////////////////////////////////
 
             // 
@@ -506,53 +641,140 @@ namespace LED_Block_Cipher
                 for (int j = 0; j < 4; j++)
                 {
                     //Round Constant :
-                    cipherText = roundConstant(cipherText, (4 * round + j));
+                    cipher_text = addConstant(cipher_text, (4 * round + j));
 
                     // Show RoundConstant level - Round : i
                     Console.WriteLine("\n------------------------------------\n\tRoundConstant Level - Round : " + (4 * round + j + 1));
-                    Block.showBlock(cipherText);
+                    Block.showBlock(cipher_text);
                     /////////////////////////////////////////////////
 
                     // Sub Cells :
-                    cipherText = subCells(cipherText);
+                    cipher_text = subCells(cipher_text, SBox);
 
                     // Show SubCells level - Round : i
                     Console.WriteLine("\tSubCells Level - Round : " + (4 * round + j + 1));
-                    Block.showBlock(cipherText);
+                    Block.showBlock(cipher_text);
                     /////////////////////////////////////////////////
 
                     // Shift Rows :
-                    cipherText = shiftRows(cipherText);
+                    cipher_text = shiftRows(cipher_text , leftShift);
 
                     // Show ShiftRows level - Round : i
                     Console.WriteLine("\tShiftRows Level - Round : " + (4 * round + j + 1));
-                    Block.showBlock(cipherText);
+                    Block.showBlock(cipher_text);
                     /////////////////////////////////////////////////
 
                     // Mix Column Serial :
-                    cipherText = mixColumnSerial(cipherText);
+                    cipher_text = mixColumnSerial(cipher_text , MDS);
 
                     // Show MixColumnSerial level - Round : i
                     Console.WriteLine("\tMixColumnSerial Level - Round : " + (4 * round + j + 1));
-                    Block.showBlock(cipherText);
+                    Block.showBlock(cipher_text);
                     /////////////////////////////////////////////////
                 }
-                cipherText = cipherText | key;
+                cipher_text = cipher_text | key;
 
                 // Show AddRoundKey level - Round : i
                 Console.WriteLine("------------------------------------");
-                Console.WriteLine("\tAddRoundKey Level - Round : " + round);
-                Block.showBlock(cipherText);
+                Console.WriteLine("\tAddRoundKey Level - Round : " + (round + 1));
+                Block.showBlock(cipher_text);
                 /////////////////////////////////////////////////
             }
 
             // Show Final CipherText :
             Console.WriteLine("\n------------------------------------\n------------------------------------");
             Console.WriteLine("\tFinal CipherText : ");
+            Block.showBlock(cipher_text);
+            /////////////////////////////////////////////////
+
+            this.cipherText = cipher_text;
+            return cipher_text;
+        }
+
+        public Block decryption(Block cipher_text, Block _key)
+        {
+            const int ALL_ROUNDS = 8;
+
+            this.cipherText = cipher_text;
+            this.key = _key;
+
+            // Show Cipher-Text Block :
+            Console.WriteLine("\tCipher Text Block : ");
             Block.showBlock(cipherText);
             /////////////////////////////////////////////////
 
-            return cipherText;
+            // Show Key Block :
+            Console.WriteLine("\tKey Block : ");
+            Block.showBlock(key);
+            /////////////////////////////////////////////////
+
+            Block plain_text = blockCopy(cipherText);
+
+            // Pre_Whitening :
+            plain_text = addRoundKey(plain_text, key);
+
+            // Show AddRoundKey level - Round : 8
+            Console.WriteLine("------------------------------------");
+            Console.WriteLine("\tInvAddRoundKey Level - Round : " + 8);
+            Block.showBlock(plain_text);
+            /////////////////////////////////////////////////                                    Updated 
+
+            // 
+            for (int round = ALL_ROUNDS - 1; round >= 0; round--)
+            {
+                for (int j = 3; j >= 0; j--)
+                {
+                    
+                    // Mix Column Serial :
+                    plain_text = mixColumnSerial(plain_text , IMDS);
+
+                    // Show MixColumnSerial level - Round : i
+                    Console.WriteLine("\n------------------------------------\n\tInvMixColumnSerial Level - Round : " + (4 * round + j + 1));
+                    Block.showBlock(plain_text);
+                    /////////////////////////////////////////////////
+
+                    // Shift Rows :
+                    plain_text = shiftRows(plain_text , inverseLeftShift);
+
+                    // Show ShiftRows level - Round : i
+                    Console.WriteLine("\tInvShiftRows Level - Round : " + (4 * round + j + 1));
+                    Block.showBlock(plain_text);
+                    /////////////////////////////////////////////////
+
+                    // Sub Cells :
+                    plain_text = subCells(plain_text, iSBox);
+
+                    // Show SubCells level - Round : i
+                    Console.WriteLine("\tInvSubCells Level - Round : " + (4 * round + j + 1));
+                    Block.showBlock(plain_text);
+                    /////////////////////////////////////////////////
+
+
+                    //Round Constant :
+                    plain_text = addConstant(plain_text, (4 * round + j));
+
+                    // Show RoundConstant level - Round : i
+                    Console.WriteLine("\tInvRoundConstant Level - Round : " + (4 * round + j + 1));
+                    Block.showBlock(plain_text);
+                    /////////////////////////////////////////////////
+                }
+                plain_text = plain_text | key;
+
+                // Show AddRoundKey level - Round : i
+                Console.WriteLine("------------------------------------");
+                Console.WriteLine("\tInvAddRoundKey Level - Round : " + (round + 1));
+                Block.showBlock(plain_text);
+                /////////////////////////////////////////////////
+            }
+
+            // Show Final CipherText :
+            Console.WriteLine("\n------------------------------------\n------------------------------------");
+            Console.WriteLine("\tFinal PlainText : ");
+            Block.showBlock(plain_text);
+            /////////////////////////////////////////////////
+
+            this.plainText = plain_text;
+            return plain_text;
         }
 
         public static Block addRoundKey(Block plain_text , Block _key)
@@ -560,7 +782,7 @@ namespace LED_Block_Cipher
             return (plain_text | _key);
         }
 
-        public static Block roundConstant(Block plain_text , int round_number)
+        public static Block addConstant(Block plain_text , int round_number)
         {
             //String[] constants = { "01" , "03" , "07" , "0F" , "1F" , "3E" , "3D" , "3B" , "37" , "2F" , "1E" , "3C" ,
             //                       "39" , "33" , "27" , "0E" , "1D" , "3A" , "35" , "2B" , "16" , "2C" , "18" , "30" ,
@@ -578,17 +800,43 @@ namespace LED_Block_Cipher
             
             int[,] intArray = { { 0, x, 0, 0 }, { 1, y, 0, 0 }, { 2, x, 0, 0 }, { 3, y, 0, 0 } };
             Block RC = new Block(intArray);
-            //if (round_number == 3)
-            //{
-            //    Console.WriteLine();
-            //}
 
-            return (plain_text | RC);
+            Block result = plain_text | RC;
+            ////////////////////////////////////////////////////////////////////////////
+
+            // Fault Injecting :
+
+            //if (round_number == 27)
+            //{
+            //    Random r = new Random();
+            //    int faultyRow, faultyColumn, faultValue;
+            //    while (true)                                                          // "if" |FaultValue - plain[i,j]| == 0 "then" try again
+            //    {
+            //        faultyRow = r.Next(0, 3);                                         // First random rowNumber was : 0
+            //        faultyColumn = r.Next(0, 3);                                      // First random columnNumber was : 2
+            //        faultValue = r.Next(0, 15);                                       // First random rowNumber was : 7
+            //        if(faultValue != plain_text.block[faultyRow, faultyColumn].Num)
+            //        {
+            //            break;
+            //        }
+            //    }
+            //result.block[faultyRow, faultyColumn].Num = faultValue;
+            //}
+            ////////////////////////////////////////////////////////////////////////////
+
+            return result;
         }
 
-        public static Block subCells(Block plain_text)
+
+        // inverseAddConstant()
+        public static Block IAC(Block plain_text, int round_number)
         {
-            int[] SBox = { 12 , 5 , 6 , 11 , 9 , 0 , 10 , 13 , 3 , 14 , 15 , 8 , 4 , 7 , 1 , 2};
+            return addConstant(plain_text , round_number);
+        }
+
+        public static Block subCells(Block plain_text , int[] S_BOX)
+        {
+            
 
             Block tempBlock = new Block();
 
@@ -597,7 +845,7 @@ namespace LED_Block_Cipher
                 for (int j = 0; j < 4; j++)
                 {
                     tempBlock.block[i, j] = new Number();
-                    tempBlock.block[i, j].Num = SBox[plain_text.block[i, j].Num];
+                    tempBlock.block[i, j].Num = S_BOX[plain_text.block[i, j].Num];
                 }
             }
 
@@ -605,7 +853,13 @@ namespace LED_Block_Cipher
             return (tempBlock);//| plain_text);
         }
 
-        public static Block shiftRows(Block plain_text)
+        //inverseSubCells()
+        public static Block ISC(Block plain_text)
+        {
+            return subCells(plain_text, iSBox);
+        }
+
+        public static Block shiftRows(Block plain_text , bool doInverseLeftShift)
         {
             Block tempBlock = new Block();
 
@@ -613,9 +867,14 @@ namespace LED_Block_Cipher
             {
                 for (int j = 0; j < i; j++)
                 {
-                    plain_text = leftShiftRow(plain_text, i);
-                    //tempBlock.block[i, j] = new Number();
-                    //tempBlock.block[i, j].Num = plain_text.block[i, j].Num;
+                    if(doInverseLeftShift == false)
+                    {
+                        plain_text = leftShiftRow(plain_text, i);
+                    }
+                    else
+                    {
+                        plain_text = rightShiftRow(plain_text, i);
+                    }
                 }
             }
             
@@ -623,16 +882,25 @@ namespace LED_Block_Cipher
             return plain_text;
         }
 
-        public static Block mixColumnSerial(Block plain_text)
+
+        //inverseShiftRows()
+        public static Block ISR(Block plain_text)
+        {
+            return shiftRows(plain_text , inverseLeftShift);
+        }
+
+        public static Block mixColumnSerial(Block plain_text , Block MDS_MATRIX)
         {
             Block tempBlock = new Block();
 
             for (int i = 0; i < 4; i++)
             {
-                Number[,] tempColumn = matrixMultiple(plain_text , i);
+                //Number[,] tempColumn = matrixMultiple(plain_text , i , MDS_MATRIX);
+                Column tempColumn = matrixMultiple(plain_text, i, MDS_MATRIX);
                 for (int j = 0; j < 4; j++)
                 {
-                    plain_text.block[j, i].Num = tempColumn[j , 0].Num;
+                    //plain_text.block[j, i].Num = tempColumn[j , 0].Num;
+                    Block.insertColumnInBlock(plain_text, tempColumn, i);
                 }
             }
             
@@ -641,54 +909,229 @@ namespace LED_Block_Cipher
         }
 
 
-        public static Number[,] matrixMultiple(Block plain_text , int column)
+        //inverseMixColumnSerial()
+        public static Block IMC(Block plain_text)
         {
-            Number[,] resultColumn = new Number[4 , 1];
-            Number[,] tempColumn = new Number[4 , 1];
+            return mixColumnSerial(plain_text, IMDS);
+        }
 
-            int[,] mdsMatrix =
+
+        public void mitmAnalysis()
+        {
+            Block tempBlock = new Block();
+            int[,] _k =
                 {
-                    { 4, 1, 2, 2 },
-                    { 8, 6, 5, 6 },
-                    { 11, 14, 10, 9 },
-                    { 2, 2, 15, 11 }
+                    { 0 , 1 , 2 , 3 },
+                    { 4 , 5 , 6 , 7 },
+                    { 8 , 9 , 10 , 11 },
+                    { 12 , 13 , 14 , 15}
                 };
-            Block MDS = new Block(mdsMatrix);
+            Block k = new Block(_k);
+            int[,] _c =
+                {
+                    { 15 , 13 , 13 , 6 },
+                    { 15 , 11 , 9 , 8 },
+                    { 4 , 5 , 15 , 8 },
+                    { 1 , 4 , 5 , 6 }
+                };
+            Block c = new Block(_c);
+
+            int[,] _ch =
+                {
+                    { 8 , 9 , 14 , 10 },
+                    { 12 , 12 , 2 , 15 },
+                    { 5 , 8 , 8 , 12 },
+                    { 11 , 4 , 10 , 0 }
+                };
+            Block ch = new Block(_ch);
+
+            
+
+            Block betaR = ISR(IMC(c));
+            Block betaHR = ISR(IMC(ch));
+            Block.showBlock(betaR | betaHR);
+
+            int[,] _delta =
+                {
+                    { 4 , 5 , 4 , 7 },
+                    { 2 , 14 , 12 , 8 },
+                    { 6 , 1 , 14 , 10 },
+                    { 9 , 14 , 5 , 8 }
+                };
+            Block delta = new Block(_delta);
+            Column deltaC0 = Block.insertBlockInColumn(delta, 0);
+            Column deltaC1 = Block.insertBlockInColumn(delta, 1);
+            Column deltaC2 = Block.insertBlockInColumn(delta, 2);
+            Column deltaC3 = Block.insertBlockInColumn(delta, 3);
 
 
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < 15; i++)
             {
-                tempColumn[i, 0] = new Number(plain_text.block[i, column].Num);
+                for (int j = 0; j < 15; j++)
+                {
+                    for (int m = 0; m < 15; m++)
+                    {
+                        for (int n = 0; n < 15; n++)
+                        {
+                            Column keyC0 = new Column(i, j, m, n);
+                            Column keyC1 = new Column(i, j, m, n);
+                            Column keyC2 = new Column(i, j, m, n);
+                            Column keyC3 = new Column(i, j, m, n);
+                            Block K = new Block(keyC0 , keyC1 , keyC2 , keyC3);
+
+
+                        }
+                    }
+                }
             }
 
-            resultColumn = MDS * tempColumn;
 
-            return resultColumn;
         }
 
 
 
 
+        public void _mitmAnalysis()
+        {
+            Block tempBlock = new Block();
+            int[,] _k =
+                {
+                    { 0 , 1 , 2 , 3 },
+                    { 4 , 5 , 6 , 7 },
+                    { 8 , 9 , 10 , 11 },
+                    { 12 , 13 , 14 , 15}
+                };
+            Block k = new Block(_k);
+            int[,] _c =
+                {
+                    { 15 , 13 , 13 , 6 },
+                    { 15 , 11 , 9 , 8 },
+                    { 4 , 5 , 15 , 8 },
+                    { 1 , 4 , 5 , 6 }
+                };
+            Block c = new Block(_c);
+
+            int[,] _ch =
+                {
+                    { 8 , 9 , 14 , 10 },
+                    { 12 , 12 , 2 , 15 },
+                    { 5 , 8 , 8 , 12 },
+                    { 11 , 4 , 10 , 0 }
+                };
+            Block ch = new Block(_ch);
+
+            int[,] _t =
+                {
+                    { 7,10,6,7 },
+                    { 9,12,0,5 },
+                    { 13,13,5,12 },
+                    { 13,4,5,3 }
+                };
+            Block t = new Block(_t);
+            int[,] _th =
+                {
+                    { 1,3,0,0 },
+                    { 13,14,0,14 },
+                    { 0,4,13,11 },
+                    { 9,1,6,12 }
+                };
+            Block th = new Block(_th);
+
+            Block betaR = shiftRows(mixColumnSerial(c , IMDS), true);
+            Block betaHR = shiftRows(mixColumnSerial(ch, IMDS), true);
+            //Block.showBlock(betaR | betaHR);
+
+            //Block deltaR_2 = subCells(shiftRows(mixColumnSerial(addConstant(subCells(betaR, iSBox), 31), IMDS), true) , iSBox);
+            //Block deltaHR_2 = subCells(shiftRows(mixColumnSerial(addConstant(subCells(betaHR, iSBox), 31), IMDS), true), iSBox);
+
+            Block betaR_1 = subCells(betaR, iSBox);
+            Block betaHR_1 = subCells(betaHR, iSBox);
+            Block.showBlock(betaR_1 | betaHR_1);
+            //Block.showBlock(deltaR_2 | deltaHR_2);
+
+            //Number[,] deltaR_2 = 4;
+
+            //for (int i = 0; i < 16; i++)
+            //{
+            //    Block yp = shiftRows(mixColumnSerial(y, IMDS), true);
+            //    Block yhp = shiftRows(mixColumnSerial(yh, IMDS), true);
+
+
+            //    int[,] k = { { i, 0, 0, 0 } , { 0, 0, 0, 0 } , { 0, 0, 0, 0 } , { 0, 0, 0, 0 } };
+            //    Block kp = new Block(k);
+            //    Block res = yp | kp;
+
+            //    Block leftOprand = subCells(shiftRows(mixColumnSerial(addConstant(subCells(res , iSBox) , 31) , IMDS) , true) , iSBox);
+            //    res = yhp | kp;
+            //    Block rightOprand = subCells(shiftRows(mixColumnSerial(addConstant(subCells(res , iSBox) , 31), IMDS), true), iSBox);
+            //    res = leftOprand | rightOprand;
+            //    //if(res.block[0,0].Num == deltaR_2)
+            //    //{
+            //    //    Console.WriteLine("i : " + i);
+            //    //}
+            //    Block.showBlock(res);
+            //    Console.WriteLine("\n");
+            //}
+        }
+
+
+        //public static Number[,] matrixMultiple(Block plain_text , int column , Block MDS_MATRIX)
+        //{
+        //    Number[,] resultColumn = new Number[4 , 1];
+        //    Number[,] tempColumn = new Number[4 , 1];
+
+
+
+
+        //    for (int i = 0; i < 4; i++)
+        //    {
+        //        tempColumn[i, 0] = new Number(plain_text.block[i, column].Num);
+        //    }
+
+        //    resultColumn = MDS_MATRIX * tempColumn;
+
+        //    return resultColumn;
+        //}
+
+
+
+        public static Column matrixMultiple(Block plain_text, int column, Block MDS_MATRIX)
+        {
+            Column resultColumn = new Column();
+            Column tempColumn = new Column();
+
+
+
+
+            for (int i = 0; i < 4; i++)
+            {
+                tempColumn.column[i, 0] = new Number(plain_text.block[i, column].Num);
+            }
+
+            resultColumn = MDS_MATRIX * tempColumn;
+
+            return resultColumn;
+        }
+
 
         public static Block leftShiftRow(Block blck , int row)
         {
-            //Block tempBlock = new Block();
             int tempNumber = blck.block[row, 0].Num;
             blck.block[row, 0].Num = blck.block[row, 1].Num;
             blck.block[row, 1].Num = blck.block[row, 2].Num;
             blck.block[row, 2].Num = blck.block[row, 3].Num;
             blck.block[row, 3].Num = tempNumber;
             return blck;
+        }
 
-
-            //for (int i = 0; i < 4; i++)
-            //{
-            //    for (int j = 0; j < 4; j++)
-            //    {
-
-            //    }
-            //}
-
+        public static Block rightShiftRow(Block blck, int row)
+        {
+            int tempNumber = blck.block[row, 3].Num;
+            blck.block[row, 3].Num = blck.block[row, 2].Num;
+            blck.block[row, 2].Num = blck.block[row, 1].Num;
+            blck.block[row, 1].Num = blck.block[row, 0].Num;
+            blck.block[row, 0].Num = tempNumber;
+            return blck;
         }
 
         public static Block blockCopy(Block block)
@@ -715,6 +1158,19 @@ namespace LED_Block_Cipher
             set
             {
                 plainText = value;
+            }
+        }
+
+        internal Block CipherText
+        {
+            get
+            {
+                return cipherText;
+            }
+
+            set
+            {
+                cipherText = value;
             }
         }
 
