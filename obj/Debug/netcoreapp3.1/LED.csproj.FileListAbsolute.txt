@@ -1,0 +1,13 @@
+D:\3__Training\Academic Trainings\3\Term 4\Thesis\3__Thesis Files\Me\Dev\LED and IDFA\LED\bin\Debug\netcoreapp3.1\LED.exe
+D:\3__Training\Academic Trainings\3\Term 4\Thesis\3__Thesis Files\Me\Dev\LED and IDFA\LED\bin\Debug\netcoreapp3.1\LED.deps.json
+D:\3__Training\Academic Trainings\3\Term 4\Thesis\3__Thesis Files\Me\Dev\LED and IDFA\LED\bin\Debug\netcoreapp3.1\LED.runtimeconfig.json
+D:\3__Training\Academic Trainings\3\Term 4\Thesis\3__Thesis Files\Me\Dev\LED and IDFA\LED\bin\Debug\netcoreapp3.1\LED.runtimeconfig.dev.json
+D:\3__Training\Academic Trainings\3\Term 4\Thesis\3__Thesis Files\Me\Dev\LED and IDFA\LED\bin\Debug\netcoreapp3.1\LED.dll
+D:\3__Training\Academic Trainings\3\Term 4\Thesis\3__Thesis Files\Me\Dev\LED and IDFA\LED\bin\Debug\netcoreapp3.1\LED.pdb
+D:\3__Training\Academic Trainings\3\Term 4\Thesis\3__Thesis Files\Me\Dev\LED and IDFA\LED\obj\Debug\netcoreapp3.1\LED.csprojAssemblyReference.cache
+D:\3__Training\Academic Trainings\3\Term 4\Thesis\3__Thesis Files\Me\Dev\LED and IDFA\LED\obj\Debug\netcoreapp3.1\LED.AssemblyInfoInputs.cache
+D:\3__Training\Academic Trainings\3\Term 4\Thesis\3__Thesis Files\Me\Dev\LED and IDFA\LED\obj\Debug\netcoreapp3.1\LED.AssemblyInfo.cs
+D:\3__Training\Academic Trainings\3\Term 4\Thesis\3__Thesis Files\Me\Dev\LED and IDFA\LED\obj\Debug\netcoreapp3.1\LED.csproj.CoreCompileInputs.cache
+D:\3__Training\Academic Trainings\3\Term 4\Thesis\3__Thesis Files\Me\Dev\LED and IDFA\LED\obj\Debug\netcoreapp3.1\LED.dll
+D:\3__Training\Academic Trainings\3\Term 4\Thesis\3__Thesis Files\Me\Dev\LED and IDFA\LED\obj\Debug\netcoreapp3.1\LED.pdb
+D:\3__Training\Academic Trainings\3\Term 4\Thesis\3__Thesis Files\Me\Dev\LED and IDFA\LED\obj\Debug\netcoreapp3.1\LED.genruntimeconfig.cache
