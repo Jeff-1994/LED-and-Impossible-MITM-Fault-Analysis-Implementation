@@ -784,11 +784,6 @@ namespace LED_Block_Cipher
 
         public static Block addConstant(Block plain_text , int round_number)
         {
-            //String[] constants = { "01" , "03" , "07" , "0F" , "1F" , "3E" , "3D" , "3B" , "37" , "2F" , "1E" , "3C" ,
-            //                       "39" , "33" , "27" , "0E" , "1D" , "3A" , "35" , "2B" , "16" , "2C" , "18" , "30" ,
-            //                       "21" , "02" , "05" , "0B" , "17" , "2E" , "1C" , "38" , "31" , "23" , "06" , "0D" ,
-            //                       "1B" , "36" , "2D" , "1A" , "34" , "29" , "12" , "24" , "08" , "11" , "22" , "04" };
-
             String[] constants = { "01" , "03" , "07" , "17" , "37" , "76" , "75" , "73" , "67" , "57" , "36" , "74" ,
                                    "71" , "63" , "47" , "16" , "35" , "72" , "65" , "53" , "26" , "54" , "30" , "60" ,
                                    "41" , "02" , "05" , "13" , "27" , "56" , "34" , "70" , "61" , "43" , "06" , "15" ,
@@ -827,13 +822,6 @@ namespace LED_Block_Cipher
             return result;
         }
 
-
-        // inverseAddConstant()
-        public static Block IAC(Block plain_text, int round_number)
-        {
-            return addConstant(plain_text , round_number);
-        }
-
         public static Block subCells(Block plain_text , int[] S_BOX)
         {
             
@@ -851,12 +839,6 @@ namespace LED_Block_Cipher
 
 
             return (tempBlock);//| plain_text);
-        }
-
-        //inverseSubCells()
-        public static Block ISC(Block plain_text)
-        {
-            return subCells(plain_text, iSBox);
         }
 
         public static Block shiftRows(Block plain_text , bool doInverseLeftShift)
@@ -882,13 +864,6 @@ namespace LED_Block_Cipher
             return plain_text;
         }
 
-
-        //inverseShiftRows()
-        public static Block ISR(Block plain_text)
-        {
-            return shiftRows(plain_text , inverseLeftShift);
-        }
-
         public static Block mixColumnSerial(Block plain_text , Block MDS_MATRIX)
         {
             Block tempBlock = new Block();
@@ -907,193 +882,6 @@ namespace LED_Block_Cipher
 
             return plain_text;
         }
-
-
-        //inverseMixColumnSerial()
-        public static Block IMC(Block plain_text)
-        {
-            return mixColumnSerial(plain_text, IMDS);
-        }
-
-
-        public void mitmAnalysis()
-        {
-            Block tempBlock = new Block();
-            int[,] _k =
-                {
-                    { 0 , 1 , 2 , 3 },
-                    { 4 , 5 , 6 , 7 },
-                    { 8 , 9 , 10 , 11 },
-                    { 12 , 13 , 14 , 15}
-                };
-            Block k = new Block(_k);
-            int[,] _c =
-                {
-                    { 15 , 13 , 13 , 6 },
-                    { 15 , 11 , 9 , 8 },
-                    { 4 , 5 , 15 , 8 },
-                    { 1 , 4 , 5 , 6 }
-                };
-            Block c = new Block(_c);
-
-            int[,] _ch =
-                {
-                    { 8 , 9 , 14 , 10 },
-                    { 12 , 12 , 2 , 15 },
-                    { 5 , 8 , 8 , 12 },
-                    { 11 , 4 , 10 , 0 }
-                };
-            Block ch = new Block(_ch);
-
-            
-
-            Block betaR = ISR(IMC(c));
-            Block betaHR = ISR(IMC(ch));
-            Block.showBlock(betaR | betaHR);
-
-            int[,] _delta =
-                {
-                    { 4 , 5 , 4 , 7 },
-                    { 2 , 14 , 12 , 8 },
-                    { 6 , 1 , 14 , 10 },
-                    { 9 , 14 , 5 , 8 }
-                };
-            Block delta = new Block(_delta);
-            Column deltaC0 = Block.insertBlockInColumn(delta, 0);
-            Column deltaC1 = Block.insertBlockInColumn(delta, 1);
-            Column deltaC2 = Block.insertBlockInColumn(delta, 2);
-            Column deltaC3 = Block.insertBlockInColumn(delta, 3);
-
-
-            for (int i = 0; i < 15; i++)
-            {
-                for (int j = 0; j < 15; j++)
-                {
-                    for (int m = 0; m < 15; m++)
-                    {
-                        for (int n = 0; n < 15; n++)
-                        {
-                            Column keyC0 = new Column(i, j, m, n);
-                            Column keyC1 = new Column(i, j, m, n);
-                            Column keyC2 = new Column(i, j, m, n);
-                            Column keyC3 = new Column(i, j, m, n);
-                            Block K = new Block(keyC0 , keyC1 , keyC2 , keyC3);
-
-
-                        }
-                    }
-                }
-            }
-
-
-        }
-
-
-
-
-        public void _mitmAnalysis()
-        {
-            Block tempBlock = new Block();
-            int[,] _k =
-                {
-                    { 0 , 1 , 2 , 3 },
-                    { 4 , 5 , 6 , 7 },
-                    { 8 , 9 , 10 , 11 },
-                    { 12 , 13 , 14 , 15}
-                };
-            Block k = new Block(_k);
-            int[,] _c =
-                {
-                    { 15 , 13 , 13 , 6 },
-                    { 15 , 11 , 9 , 8 },
-                    { 4 , 5 , 15 , 8 },
-                    { 1 , 4 , 5 , 6 }
-                };
-            Block c = new Block(_c);
-
-            int[,] _ch =
-                {
-                    { 8 , 9 , 14 , 10 },
-                    { 12 , 12 , 2 , 15 },
-                    { 5 , 8 , 8 , 12 },
-                    { 11 , 4 , 10 , 0 }
-                };
-            Block ch = new Block(_ch);
-
-            int[,] _t =
-                {
-                    { 7,10,6,7 },
-                    { 9,12,0,5 },
-                    { 13,13,5,12 },
-                    { 13,4,5,3 }
-                };
-            Block t = new Block(_t);
-            int[,] _th =
-                {
-                    { 1,3,0,0 },
-                    { 13,14,0,14 },
-                    { 0,4,13,11 },
-                    { 9,1,6,12 }
-                };
-            Block th = new Block(_th);
-
-            Block betaR = shiftRows(mixColumnSerial(c , IMDS), true);
-            Block betaHR = shiftRows(mixColumnSerial(ch, IMDS), true);
-            //Block.showBlock(betaR | betaHR);
-
-            //Block deltaR_2 = subCells(shiftRows(mixColumnSerial(addConstant(subCells(betaR, iSBox), 31), IMDS), true) , iSBox);
-            //Block deltaHR_2 = subCells(shiftRows(mixColumnSerial(addConstant(subCells(betaHR, iSBox), 31), IMDS), true), iSBox);
-
-            Block betaR_1 = subCells(betaR, iSBox);
-            Block betaHR_1 = subCells(betaHR, iSBox);
-            Block.showBlock(betaR_1 | betaHR_1);
-            //Block.showBlock(deltaR_2 | deltaHR_2);
-
-            //Number[,] deltaR_2 = 4;
-
-            //for (int i = 0; i < 16; i++)
-            //{
-            //    Block yp = shiftRows(mixColumnSerial(y, IMDS), true);
-            //    Block yhp = shiftRows(mixColumnSerial(yh, IMDS), true);
-
-
-            //    int[,] k = { { i, 0, 0, 0 } , { 0, 0, 0, 0 } , { 0, 0, 0, 0 } , { 0, 0, 0, 0 } };
-            //    Block kp = new Block(k);
-            //    Block res = yp | kp;
-
-            //    Block leftOprand = subCells(shiftRows(mixColumnSerial(addConstant(subCells(res , iSBox) , 31) , IMDS) , true) , iSBox);
-            //    res = yhp | kp;
-            //    Block rightOprand = subCells(shiftRows(mixColumnSerial(addConstant(subCells(res , iSBox) , 31), IMDS), true), iSBox);
-            //    res = leftOprand | rightOprand;
-            //    //if(res.block[0,0].Num == deltaR_2)
-            //    //{
-            //    //    Console.WriteLine("i : " + i);
-            //    //}
-            //    Block.showBlock(res);
-            //    Console.WriteLine("\n");
-            //}
-        }
-
-
-        //public static Number[,] matrixMultiple(Block plain_text , int column , Block MDS_MATRIX)
-        //{
-        //    Number[,] resultColumn = new Number[4 , 1];
-        //    Number[,] tempColumn = new Number[4 , 1];
-
-
-
-
-        //    for (int i = 0; i < 4; i++)
-        //    {
-        //        tempColumn[i, 0] = new Number(plain_text.block[i, column].Num);
-        //    }
-
-        //    resultColumn = MDS_MATRIX * tempColumn;
-
-        //    return resultColumn;
-        //}
-
-
 
         public static Column matrixMultiple(Block plain_text, int column, Block MDS_MATRIX)
         {

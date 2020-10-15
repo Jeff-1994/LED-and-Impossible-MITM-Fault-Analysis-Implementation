@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\3__Training\\Academic Trainings\\3\\Term 4\\Thesis\\3__Thesis Files\\Me\\Dev\\LED and IDFA\\LED\\LED.csproj": {}
+    "D:\\3__Training\\Academic Trainings\\3__M. Sc in Computer Sciences - 96 DU\\Term 4\\Thesis\\3__Thesis Files\\Me\\Dev\\LED and IDFA\\LED\\LED.csproj": {}
   },
   "projects": {
-    "D:\\3__Training\\Academic Trainings\\3\\Term 4\\Thesis\\3__Thesis Files\\Me\\Dev\\LED and IDFA\\LED\\LED.csproj": {
+    "D:\\3__Training\\Academic Trainings\\3__M. Sc in Computer Sciences - 96 DU\\Term 4\\Thesis\\3__Thesis Files\\Me\\Dev\\LED and IDFA\\LED\\LED.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\3__Training\\Academic Trainings\\3\\Term 4\\Thesis\\3__Thesis Files\\Me\\Dev\\LED and IDFA\\LED\\LED.csproj",
+        "projectUniqueName": "D:\\3__Training\\Academic Trainings\\3__M. Sc in Computer Sciences - 96 DU\\Term 4\\Thesis\\3__Thesis Files\\Me\\Dev\\LED and IDFA\\LED\\LED.csproj",
         "projectName": "LED",
-        "projectPath": "D:\\3__Training\\Academic Trainings\\3\\Term 4\\Thesis\\3__Thesis Files\\Me\\Dev\\LED and IDFA\\LED\\LED.csproj",
+        "projectPath": "D:\\3__Training\\Academic Trainings\\3__M. Sc in Computer Sciences - 96 DU\\Term 4\\Thesis\\3__Thesis Files\\Me\\Dev\\LED and IDFA\\LED\\LED.csproj",
         "packagesPath": "C:\\Users\\Jeff\\.nuget\\packages\\",
-        "outputPath": "D:\\3__Training\\Academic Trainings\\3\\Term 4\\Thesis\\3__Thesis Files\\Me\\Dev\\LED and IDFA\\LED\\obj\\",
+        "outputPath": "D:\\3__Training\\Academic Trainings\\3__M. Sc in Computer Sciences - 96 DU\\Term 4\\Thesis\\3__Thesis Files\\Me\\Dev\\LED and IDFA\\LED\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Jeff\\AppData\\Roaming\\NuGet\\NuGet.Config"
