@@ -10,7 +10,7 @@ namespace LED_Block_Cipher
     {
         static void Main(string[] args)
         {
-            // Convert Key And PlainText To Program's Format : 
+            // Convert Key And PlainText And CipherText To Program's Format : 
             int[,] plain = 
                 { 
                     {  0,  1,  2, 3  },
