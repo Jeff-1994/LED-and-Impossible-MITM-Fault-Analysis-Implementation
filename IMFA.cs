@@ -39,171 +39,270 @@ namespace LED_Block_Cipher
 
         }
 
-        public void execute()
+         public void execute(Block[,] data)
         {
-
-        }
-
-        public void _mitmAnalysis()
-        {
-            Block tempBlock = new Block();
-            int[,] _k =
-                {
-                    { 0 , 1 , 2 , 3 },
-                    { 4 , 5 , 6 , 7 },
-                    { 8 , 9 , 10 , 11 },
-                    { 12 , 13 , 14 , 15}
-                };
-            Block k = new Block(_k);
-            int[,] _c =
-                {
-                    { 15 , 13 , 13 , 6 },
-                    { 15 , 11 , 9 , 8 },
-                    { 4 , 5 , 15 , 8 },
-                    { 1 , 4 , 5 , 6 }
-                };
-            Block c = new Block(_c);
-
-            int[,] _ch =
-                {
-                    { 8 , 9 , 14 , 10 },
-                    { 12 , 12 , 2 , 15 },
-                    { 5 , 8 , 8 , 12 },
-                    { 11 , 4 , 10 , 0 }
-                };
-            Block ch = new Block(_ch);
-
-            int[,] _t =
-                {
-                    { 7,10,6,7 },
-                    { 9,12,0,5 },
-                    { 13,13,5,12 },
-                    { 13,4,5,3 }
-                };
-            Block t = new Block(_t);
-            int[,] _th =
-                {
-                    { 1,3,0,0 },
-                    { 13,14,0,14 },
-                    { 0,4,13,11 },
-                    { 9,1,6,12 }
-                };
-            Block th = new Block(_th);
-
-            Block betaR = LED.shiftRows(LED.mixColumnSerial(c , IMDS), true);
-            Block betaHR = LED.shiftRows(LED.mixColumnSerial(ch, IMDS), true);
-            //Block.showBlock(betaR | betaHR);
-
-            //Block deltaR_2 = subCells(shiftRows(mixColumnSerial(addConstant(subCells(betaR, iSBox), 31), IMDS), true) , iSBox);
-            //Block deltaHR_2 = subCells(shiftRows(mixColumnSerial(addConstant(subCells(betaHR, iSBox), 31), IMDS), true), iSBox);
-
-            Block betaR_1 = LED.subCells(betaR, iSBox);
-            Block betaHR_1 = LED.subCells(betaHR, iSBox);
-            Block.showBlock(betaR_1 | betaHR_1);
-            //Block.showBlock(deltaR_2 | deltaHR_2);
-
-            //Number[,] deltaR_2 = 4;
-
-            //for (int i = 0; i < 16; i++)
-            //{
-            //    Block yp = shiftRows(mixColumnSerial(y, IMDS), true);
-            //    Block yhp = shiftRows(mixColumnSerial(yh, IMDS), true);
-
-
-            //    int[,] k = { { i, 0, 0, 0 } , { 0, 0, 0, 0 } , { 0, 0, 0, 0 } , { 0, 0, 0, 0 } };
-            //    Block kp = new Block(k);
-            //    Block res = yp | kp;
-
-            //    Block leftOprand = subCells(shiftRows(mixColumnSerial(addConstant(subCells(res , iSBox) , 31) , IMDS) , true) , iSBox);
-            //    res = yhp | kp;
-            //    Block rightOprand = subCells(shiftRows(mixColumnSerial(addConstant(subCells(res , iSBox) , 31), IMDS), true), iSBox);
-            //    res = leftOprand | rightOprand;
-            //    //if(res.block[0,0].Num == deltaR_2)
-            //    //{
-            //    //    Console.WriteLine("i : " + i);
-            //    //}
-            //    Block.showBlock(res);
-            //    Console.WriteLine("\n");
-            //}
-        }
-
-         public void mitmAnalysis()
-        {
-            Block tempBlock = new Block();
-            int[,] _k =
-                {
-                    { 0 , 1 , 2 , 3 },
-                    { 4 , 5 , 6 , 7 },
-                    { 8 , 9 , 10 , 11 },
-                    { 12 , 13 , 14 , 15}
-                };
-            Block k = new Block(_k);
-            int[,] _c =
-                {
-                    { 15 , 13 , 13 , 6 },
-                    { 15 , 11 , 9 , 8 },
-                    { 4 , 5 , 15 , 8 },
-                    { 1 , 4 , 5 , 6 }
-                };
-            Block c = new Block(_c);
-
-            int[,] _ch =
-                {
-                    { 8 , 9 , 14 , 10 },
-                    { 12 , 12 , 2 , 15 },
-                    { 5 , 8 , 8 , 12 },
-                    { 11 , 4 , 10 , 0 }
-                };
-            Block ch = new Block(_ch);
-
+            int faultsNumber = 50;
+            Column[] firstColumn0 = null;
+            Column[] secondColumn0 = null;
+            Column[] firstColumn1 = null;
+            Column[] secondColumn1 = null;
+            Column[] firstColumn2 = null;
+            Column[] secondColumn2 = null;
+            Column[] firstColumn3 = null;
+            Column[] secondColumn3 = null;
+            Block resultKey;
             
-
-            Block betaR = ISR(IMC(c));
-            Block betaHR = ISR(IMC(ch));
-            Block.showBlock(betaR | betaHR);
-
-            int[,] _delta =
-                {
-                    { 4 , 5 , 4 , 7 },
-                    { 2 , 14 , 12 , 8 },
-                    { 6 , 1 , 14 , 10 },
-                    { 9 , 14 , 5 , 8 }
-                };
-            Block delta = new Block(_delta);
-            Column deltaC0 = Block.insertBlockInColumn(delta, 0);
-            Column deltaC1 = Block.insertBlockInColumn(delta, 1);
-            Column deltaC2 = Block.insertBlockInColumn(delta, 2);
-            Column deltaC3 = Block.insertBlockInColumn(delta, 3);
-
-
-            for (int i = 0; i < 15; i++)
+            Block[] deltas = calculateDeltaValues();
+            for (int num = 0; num < faultsNumber; num++)
             {
-                for (int j = 0; j < 15; j++)
+                Block correct = data[num , 0];
+                Block faulty = data[num , 1];
+                Block yp = ISR(IMC(correct));
+                Block yhp = ISR(IMC(faulty));
+
+                for (int i = 0; i < 16; i++)
                 {
-                    for (int m = 0; m < 15; m++)
+                    for (int j = 0; j < 16; j++)
                     {
-                        for (int n = 0; n < 15; n++)
+                        for (int m = 0; m < 16; m++)
                         {
-                            Column keyC0 = new Column(i, j, m, n);
-                            Column keyC1 = new Column(i, j, m, n);
-                            Column keyC2 = new Column(i, j, m, n);
-                            Column keyC3 = new Column(i, j, m, n);
-                            Block K = new Block(keyC0 , keyC1 , keyC2 , keyC3);
+                            for (int n = 0; n < 16; n++)
+                            {
+                                Column C = new Column(i , j , m , n);
+                                Block G = new Block(C , C , C , C);
+                                //Block.showBlock(G);
+                                Block kBr = ISR(IMC(G));
+                                //Block.showBlock(kBr);
+                                Block phi = ISC(ISR(IMC(AC(ISC(yp | kBr),31))))
+                                          | ISC(ISR(IMC(AC(ISC(yhp | kBr),31))));
+                                Column bC0 = new Column(phi.block[0,0].Num , phi.block[1,1].Num , phi.block[2,2].Num , phi.block[3,3].Num);
+                                Column bC1 = new Column(phi.block[0,1].Num , phi.block[1,2].Num , phi.block[2,3].Num , phi.block[3,0].Num);
+                                Column bC2 = new Column(phi.block[0,2].Num , phi.block[1,3].Num , phi.block[2,0].Num , phi.block[3,1].Num);
+                                Column bC3 = new Column(phi.block[0,3].Num , phi.block[1,0].Num , phi.block[2,1].Num , phi.block[3,2].Num);
+                                
+                                // For Column #0 :
+                                for (int d = 0; d < deltas.Length; d++)
+                                {
+                                    Column dC0 = new Column(deltas[d].block[0,0].Num , deltas[d].block[1,1].Num , deltas[d].block[2,2].Num , deltas[d].block[3,3].Num);
+                                    if (bC0 == dC0)
+                                    {
+                                        secondColumn0 = addToArray(secondColumn0 , C);
+                                    }
+                                }
 
+                                // For Column #1 :
+                                for (int d = 0; d < deltas.Length; d++)
+                                {
+                                    Column dC1 = new Column(deltas[d].block[0,1].Num , deltas[d].block[1,2].Num , deltas[d].block[2,3].Num , deltas[d].block[3,0].Num);
+                                    if (bC1 == dC1)
+                                    {
+                                        secondColumn1 = addToArray(secondColumn1 , C);
+                                    }
+                                }
 
+                                // For Column #2 :
+                                for (int d = 0; d < deltas.Length; d++)
+                                {
+                                    Column dC2 = new Column(deltas[d].block[0,2].Num , deltas[d].block[1,3].Num , deltas[d].block[2,0].Num , deltas[d].block[3,1].Num);
+                                    if (bC2 == dC2)
+                                    {
+                                        secondColumn2 = addToArray(secondColumn2 , C);
+                                    }
+                                }
+
+                                // For Column #3 :
+                                for (int d = 0; d < deltas.Length; d++)
+                                {
+                                    Column dC3 = new Column(deltas[d].block[0,3].Num , deltas[d].block[1,0].Num , deltas[d].block[2,1].Num , deltas[d].block[3,2].Num);
+                                    if (bC3 == dC3)
+                                    {
+                                        secondColumn3 = addToArray(secondColumn3 , C);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                Column c0 , c1 , c2 , c3;
+                //Console.WriteLine("Number of Fault : " + num);
+                firstColumn0 = intersection(firstColumn0 , secondColumn0);
+                firstColumn1 = intersection(firstColumn1 , secondColumn1);
+                firstColumn2 = intersection(firstColumn2 , secondColumn2);
+                firstColumn3 = intersection(firstColumn3 , secondColumn3);
+                if ((firstColumn0.Length == 1) && (firstColumn1.Length == 1) && (firstColumn2.Length == 1) && (firstColumn3.Length == 1))
+                {
+                    c0 = firstColumn0[0];
+                    c1 = firstColumn1[0];
+                    c2 = firstColumn2[0];
+                    c3 = firstColumn3[0];
+
+                    resultKey = new Block(c0 , c1 , c2 , c3);
+                    Block.showBlock(resultKey);
+
+                    break;
+                }
+            }
+        }
+        
+        public static Block[,] createCorrectAndFaultyData(Block plainText , Block key)
+        {
+            Block [,]result = new Block[50,2];
+
+            LED LBC = new LED();
+
+            for (int i = 0; i < 50; i++)
+            {
+                result[i,0] = LBC.encryptionWithoutPrint(plainText , key , false);
+                result[i,1] = LBC.encryptionWithoutPrint(plainText , key , true);
+            }
+
+            return result;
+        } 
+
+        public static Column[] addToArray(Column[] array , Column col)
+        {
+            if(array == null)
+            {
+                Column[] res = new Column[1];
+                res[0] = col;
+                return res;
+            }
+            int newLength = array.Length + 1;
+            Column[] result = new Column[newLength];
+            for (int i = 0; i < array.Length; i++)
+            {
+                result[i] = array[i];
+            }
+            result[newLength - 1] = col;
+            return result;
+        }
+
+        public static Column[] intersection(Column[] cols1 , Column[] cols2)
+        {
+            if(cols1 == null)
+            {
+                return cols2;
+            }
+
+            Column[] tempArr = new Column[cols1.Length];
+
+            int k = 0;
+            for (int i = 0; i < cols1.Length; i++)
+            {
+                for (int j = 0; j < cols2.Length; j++)
+                {
+                    if(cols1[i] == cols2[j])
+                    {
+                        tempArr[k] = cols1[i];
+                        k++;
+                    }
+                }
+            }
+
+            if(k == 0)
+            {
+                return null;
+            }
+            
+            Column[] result = new Column[k];
+
+            for (int i = 0; i < k; i++)
+            {
+                result[i] = tempArr[i];
+            }
+
+            return result;
+        }
+
+        public static Block[] calculateDeltaValues()
+        {
+            int length = (int) Math.Pow(15 , 4);
+            Block[] outputs = new Block[length];
+
+            int k = 0;
+            for (int i = 1; i < 16; i++)
+            {
+                for (int j = 1; j < 16; j++)
+                {
+                    for (int m = 1; m < 16; m++)
+                    {
+                        for (int n = 1; n < 16; n++)
+                        {
+                            Column c = new Column(i , j , m ,n);
+                            Block tempBlock = new Block(c , c , c , c);
+                            outputs[k] = MC(tempBlock);
+                            k++;
+                        }
+                    }
+                }
+            }
+            return outputs;
+        }
+
+        public static int[,] noneZeroNibblesTable()
+        {
+            int[,] result = new int[5 , 5];
+
+            for (int i = 0; i < 16; i++)
+            {
+                for (int j = 0; j < 16; j++)
+                {
+                    for (int m = 0; m < 16; m++)
+                    {
+                        for (int n = 0; n < 16; n++)
+                        {
+                            Column tempCol = new Column(i , j , m , n);
+                            Column mltBlock =  MDS * tempCol;
+
+                            int inputNoneZeros = 4 - calculateNoneZeroNibbles(tempCol);
+                            int outputNoneZeros = 4 - calculateNoneZeroNibbles(mltBlock);
+
+                            for (int k = 0; k < 5; k++)
+                            {
+                                for (int l = 0; l < 5; l++)
+                                {
+                                    if((k == inputNoneZeros) && (l == outputNoneZeros))
+                                    {
+                                        result[k , l]++;
+                                    }   
+                                }
+                            }
                         }
                     }
                 }
             }
 
-
+            return result;
         }
 
+        public static void showTable(int[ , ] table)
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                for (int j = 0; j < 5; j++)
+                {
+                    Console.Write("\t" + table[i , j]);
+                }
+                Console.Write("\n");
+            }
+        }
 
-        
+        public static int calculateNoneZeroNibbles(Column col)
+        {
+            int counter = 0;
+            for (int i = 0; i < 4; i++)
+            {
+                if(col.column[i , 0].Num == 0)
+                {
+                    counter++;
+                }
+            }            
+            return counter;
+        }
+
         public static Block AC(Block plain_text, int round_number)
         {
-            return LED.addConstant(plain_text , round_number);
+            return LED.addConstant(plain_text , round_number , false);
         }
 
         public static Block SC(Block plain_text)
@@ -224,7 +323,7 @@ namespace LED_Block_Cipher
 
         public static Block IAC(Block plain_text, int round_number)
         {
-            return LED.addConstant(plain_text , round_number);
+            return LED.addConstant(plain_text , round_number , false);
         }
 
         public static Block ISC(Block plain_text)

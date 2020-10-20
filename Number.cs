@@ -124,8 +124,57 @@ namespace LED_Block_Cipher
         {
             for (int i = 0; i < 4; i++)
             {
-                Console.WriteLine(col.column[i, 0].Num);
+                String tempStr;
+                    switch (col.column[i, 0].Num)
+                    {
+                        case 10:
+                            tempStr = "A";
+                            break;
+                        case 11:
+                            tempStr = "B";
+                            break;
+                        case 12:
+                            tempStr = "C";
+                            break;
+                        case 13:
+                            tempStr = "D";
+                            break;
+                        case 14:
+                            tempStr = "E";
+                            break;
+                        case 15:
+                            tempStr = "F";
+                            break;
+                        default:
+                            tempStr = col.column[i, 0].Num.ToString();
+                            break;
+                    }
+                Console.WriteLine(tempStr);
             }
+        }
+
+        public static Boolean operator ==(Column clm1, Column clm2)
+        {
+            if(clm1.col[0,0].Num == clm2.col[0,0].Num &&
+               clm1.col[1,0].Num == clm2.col[1,0].Num &&
+               clm1.col[2,0].Num == clm2.col[2,0].Num &&
+               clm1.col[3,0].Num == clm2.col[3,0].Num)
+               {
+                   return true;
+               }
+            return false;
+        }
+
+        public static Boolean operator !=(Column clm1, Column clm2)
+        {
+            if(clm1.col[0,0].Num == clm2.col[0,0].Num &&
+               clm1.col[1,0].Num == clm2.col[1,0].Num &&
+               clm1.col[2,0].Num == clm2.col[2,0].Num &&
+               clm1.col[3,0].Num == clm2.col[3,0].Num)
+               {
+                   return false;
+               }
+            return true;
         }
 
         internal Number[,] column
@@ -641,7 +690,7 @@ namespace LED_Block_Cipher
                 for (int j = 0; j < 4; j++)
                 {
                     //Round Constant :
-                    cipher_text = addConstant(cipher_text, (4 * round + j));
+                    cipher_text = addConstant(cipher_text, (4 * round + j) , false);
 
                     // Show RoundConstant level - Round : i
                     Console.WriteLine("\n------------------------------------\n\tRoundConstant Level - Round : " + (4 * round + j + 1));
@@ -751,7 +800,7 @@ namespace LED_Block_Cipher
 
 
                     //Round Constant :
-                    plain_text = addConstant(plain_text, (4 * round + j));
+                    plain_text = addConstant(plain_text, (4 * round + j) , false);    // Fault Injection belongs to Encryption method
 
                     // Show RoundConstant level - Round : i
                     Console.WriteLine("\tInvRoundConstant Level - Round : " + (4 * round + j + 1));
@@ -777,12 +826,53 @@ namespace LED_Block_Cipher
             return plain_text;
         }
 
+        public Block encryptionWithoutPrint(Block plain_text, Block _key , Boolean faultInjection)
+        {
+            const int ALL_ROUNDS = 8;
+
+            this.plainText = plain_text;
+            this.key = _key;
+
+            Block cipher_text = blockCopy(plainText);
+
+            // Pre_Whitening :
+            cipher_text = addRoundKey(cipher_text, key);
+
+            // 
+            for (int round = 0; round < ALL_ROUNDS; round++)
+            {
+                for (int j = 0; j < 4; j++)
+                {
+                    //Round Constant :
+                    cipher_text = addConstant(cipher_text, (4 * round + j) , faultInjection);
+                    /////////////////////////////////////////////////
+
+                    // Sub Cells :
+                    cipher_text = subCells(cipher_text, SBox);
+                    /////////////////////////////////////////////////
+
+                    // Shift Rows :
+                    cipher_text = shiftRows(cipher_text , leftShift);
+                    /////////////////////////////////////////////////
+
+                    // Mix Column Serial :
+                    cipher_text = mixColumnSerial(cipher_text , MDS);
+                    /////////////////////////////////////////////////
+                }
+                cipher_text = cipher_text | key;
+                /////////////////////////////////////////////////
+            }
+
+            this.cipherText = cipher_text;
+            return cipher_text;
+        }
+
         public static Block addRoundKey(Block plain_text , Block _key)
         {
             return (plain_text | _key);
         }
 
-        public static Block addConstant(Block plain_text , int round_number)
+        public static Block addConstant(Block plain_text , int round_number , Boolean faultInjection)
         {
             String[] constants = { "01" , "03" , "07" , "17" , "37" , "76" , "75" , "73" , "67" , "57" , "36" , "74" ,
                                    "71" , "63" , "47" , "16" , "35" , "72" , "65" , "53" , "26" , "54" , "30" , "60" ,
@@ -801,22 +891,25 @@ namespace LED_Block_Cipher
 
             // Fault Injecting :
 
-            //if (round_number == 27)
-            //{
-            //    Random r = new Random();
-            //    int faultyRow, faultyColumn, faultValue;
-            //    while (true)                                                          // "if" |FaultValue - plain[i,j]| == 0 "then" try again
-            //    {
-            //        faultyRow = r.Next(0, 3);                                         // First random rowNumber was : 0
-            //        faultyColumn = r.Next(0, 3);                                      // First random columnNumber was : 2
-            //        faultValue = r.Next(0, 15);                                       // First random rowNumber was : 7
-            //        if(faultValue != plain_text.block[faultyRow, faultyColumn].Num)
-            //        {
-            //            break;
-            //        }
-            //    }
-            //result.block[faultyRow, faultyColumn].Num = faultValue;
-            //}
+            if (faultInjection)
+            {
+                if (round_number == 27)
+                {
+                Random r = new Random();
+                int faultyRow, faultyColumn, faultValue;
+                while (true)                                                          // "if" |FaultValue - plain[i,j]| == 0 "then" try again
+                {
+                    faultyRow = r.Next(0, 3);                                         // First random rowNumber was : 0
+                    faultyColumn = r.Next(0, 3);                                      // First random columnNumber was : 2
+                    faultValue = r.Next(0, 15);                                       // First random rowNumber was : 7
+                    if(faultValue != plain_text.block[faultyRow, faultyColumn].Num)
+                    {
+                        break;
+                    }
+                }
+                result.block[faultyRow, faultyColumn].Num = faultValue;
+                }
+            }
             ////////////////////////////////////////////////////////////////////////////
 
             return result;
